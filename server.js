@@ -5,10 +5,14 @@ import https from "https";
 import next from "next";
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.HOSTNAME || "0.0.0.0";
 const port = Number(process.env.PORT) || 3000;
+const nextHostname =
+  process.env.RENDER_EXTERNAL_HOSTNAME ||
+  process.env.HOST ||
+  process.env.HOSTNAME ||
+  "localhost";
 
-const app = next({ dev, hostname, port });
+const app = next({ dev, hostname: nextHostname, port });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
@@ -28,12 +32,18 @@ app.prepare().then(() => {
       cert: fs.readFileSync("./certs/server.pem"),
     };
 
-    https.createServer(httpsOptions, requestListener).listen(port, () => {
-      console.log(`🚀 HTTPS server ready at https://localhost:${port}`);
-    });
+    https
+      .createServer(httpsOptions, requestListener)
+      .listen(port, "localhost", () => {
+        console.log(`🚀 HTTPS server ready at https://localhost:${port}`);
+      });
   } else {
-    http.createServer(requestListener).listen(port, hostname, () => {
-      console.log(`✅ Server ready at http://${hostname}:${port}`);
-    });
+    http
+      .createServer(requestListener)
+      .listen(port, "0.0.0.0", () => {
+        console.log(
+          `✅ Server ready on 0.0.0.0:${port} (external host: ${nextHostname})`
+        );
+      });
   }
 });

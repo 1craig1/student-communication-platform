@@ -43,7 +43,7 @@ npm run start
 
 ## Deployment
 - **Update `server.js` for hosting**:
-  - Already configured: in production the server listens on `process.env.PORT`/`process.env.HOSTNAME` and serves HTTP (platform handles HTTPS).
+  - Already configured: in production the server listens on `process.env.PORT` at `0.0.0.0` while using `RENDER_EXTERNAL_HOSTNAME`/`HOSTNAME` for Next.js, so managed hosts can connect and expose HTTPS.
 - **Deploy on a managed host (example: Render)**:
   1. Push the project to a Git repository (GitHub/GitLab).
   2. Create a new **Web Service** on [Render](https://render.com), connect the repository, and pick the `pnpm` build & start commands:
