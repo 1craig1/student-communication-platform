@@ -28,9 +28,11 @@ pnpm run start
 npm run build
 npm run start
 ```
-- `start` uses `server.js` to serve the built Next.js app over HTTPS.
+
+- When `NODE_ENV=production`, `server.js` falls back to plain HTTP and listens on `process.env.PORT` (default `3000`), ready for hosting platforms that provide TLS termination.
 
 ## Tech Stack
+
 - Next.js 15 (App Router)
 - React 19
 - TypeScript 5
@@ -41,14 +43,13 @@ npm run start
 
 ## Deployment
 - **Update `server.js` for hosting**:
-  - Read `process.env.PORT` and `process.env.HOSTNAME` (default to `3000` and `0.0.0.0`) so the process can run on the port assigned by the platform.
-  - Optionally load cert paths from environment variables when deploying behind your own TLS termination.
+  - Already configured: in production the server listens on `process.env.PORT`/`process.env.HOSTNAME` and serves HTTP (platform handles HTTPS).
 - **Deploy on a managed host (example: Render)**:
   1. Push the project to a Git repository (GitHub/GitLab).
   2. Create a new **Web Service** on [Render](https://render.com), connect the repository, and pick the `pnpm` build & start commands:
      - Build command: `pnpm install && pnpm run build`
      - Start command: `pnpm run start`
-  3. Render terminates HTTPS for you, so you can delete the local `certs` usage or adjust `server.js` to fall back to plain HTTP when `NODE_ENV=production` (Render provides TLS on its own domain).
+  3. Render terminates HTTPS for you; the app now serves HTTP internally while Render provides the public HTTPS endpoint.
   4. After the build finishes, Render exposes a public URL like `https://your-app.onrender.com` that you can share immediately.
 - **Alternative hosts**:
   - Railway, Fly.io, and Google Cloud Run follow similar steps—deploy the repo, set the build/start commands, and use their generated HTTPS endpoint.

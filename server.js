@@ -1,29 +1,39 @@
 // server.js
 import fs from "fs";
+import http from "http";
 import https from "https";
 import next from "next";
 
 const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
+const hostname = process.env.HOSTNAME || "0.0.0.0";
+const port = Number(process.env.PORT) || 3000;
+
+const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
-const PORT = process.env.PORT || 3000;
-const httpsOptions = {
-  key: fs.readFileSync("./certs/server.key"),
-  cert: fs.readFileSync("./certs/server.pem"),
-};
 
 app.prepare().then(() => {
-  https
-    .createServer(httpsOptions, (req, res) => {
+  const requestListener = (req, res) => {
+    if (dev) {
       res.setHeader(
         "Strict-Transport-Security",
         "max-age=31536000; includeSubDomains; preload"
       );
-      // only accepy https https://localhost:3000
-      return handle(req, res);
-    })
-    .listen(PORT, () => {
-      console.log(`🚀 HTTPS Server ready at https://localhost:${PORT}`);
+    }
+    return handle(req, res);
+  };
+
+  if (dev) {
+    const httpsOptions = {
+      key: fs.readFileSync("./certs/server.key"),
+      cert: fs.readFileSync("./certs/server.pem"),
+    };
+
+    https.createServer(httpsOptions, requestListener).listen(port, () => {
+      console.log(`🚀 HTTPS server ready at https://localhost:${port}`);
     });
-    
+  } else {
+    http.createServer(requestListener).listen(port, hostname, () => {
+      console.log(`✅ Server ready at http://${hostname}:${port}`);
+    });
+  }
 });
