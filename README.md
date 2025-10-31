@@ -1,7 +1,7 @@
 # INFO2222-TUT07-G06-P2
 ## Deployment website: https://student-communication-platform.onrender.com
 it can delay requests by 50 seconds or more because using a free server
-
+Main function of the website is that you can message with other user by adding their as friend by ID or name with End-to-end encrypted message
 ## Run locally:
 ## Prerequisites
 - Node.js ≥ 18.17 (required by Next.js 15)
